@@ -1,0 +1,1 @@
+npm i && composer i && php artisan key:generate && php artisan storage:link && php artisan migrate --seed && start cmd /c php artisan serve && start cmd /c npm run dev
