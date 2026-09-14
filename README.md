@@ -1,45 +1,66 @@
-# Конференции.РФ
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-## Установка (на экзамене — с офлайн-сервера)
-1. `composer create-project laravel/laravel conf` — создать базовый проект (пакеты берутся с офлайн-сервера).
-2. Скопировать содержимое этой папки поверх созданного проекта (файлы `app/`, `database/`, `resources/`, `routes/web.php`, `README.md` — заменяют/дополняют то, что сгенерировал composer).
-3. Настроить `.env`: `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` под общий сервер БД.
-4. В `bootstrap/app.php` зарегистрировать middleware `admin` (файл создаёт composer, этой строки там по умолчанию нет):
-```php
-->withMiddleware(function (Middleware $middleware) {
-    $middleware->alias([
-        'admin' => \App\Http\Middleware\IsAdmin::class,
-    ]);
-})
-```
-5. `php artisan migrate --seed` (или `migrate` + `php artisan db:seed`) — создаст только админа Conf2027/Demo77, таблица залов пустая — добавляй через `/admin/rooms/create`
-6. Скопировать шрифты (PTSans-Regular.ttf, PTSans-Bold.ttf) в `public/fonts/`.
-7. `php artisan storage:link` — без этого фото залов не будут показываться (папка `storage/app/public/rooms`).
-8. `php artisan serve`
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-## Что где
-- `database/migrations/` — таблицы users (+login, phone, is_admin), rooms, bookings (room_id → rooms)
-- `app/Models/` — User, Room, Booking
-- `app/Http/Middleware/IsAdmin.php` — проверка `is_admin` в одном месте (алиас `admin`, вешается на группу роутов, не в каждом методе контроллера)
-- `app/Http/Requests/` — RegisterRequest, LoginRequest, BookingRequest, ReviewRequest, StatusRequest, RoomRequest
-- `database/seeders/AdminSeeder.php` — создаёт пользователя-админа (login=Conf2027, password=Demo77, is_admin=true)
-- `app/Http/Controllers/` — AuthController (общий вход — по `is_admin` редиректит на `/bookings` или `/admin/dashboard`), BookingController (заявки), AdminController (статусы заявок, п.5 задания), RoomController (главная страница со списком залов + CRUD залов у админа)
-- `routes/web.php` — все маршруты
-- `resources/views/` — каждая страница цельным HTML-файлом (без @extends/@section), стили подключены из `public/css/style.css` (без Bootstrap, палитра по гайду: #007bff, #0d47a1, #6c757d, #f8f9fa, шрифт PT Sans)
-- `public/css/style.css` — общий стиль, `public/fonts/` — сюда положить PTSans-Regular.ttf / PTSans-Bold.ttf
+## About Laravel
 
-## Залы
-`/` — главная страница, список залов (публичная), карточки кликабельны.
-`/rooms/{room}` — страница зала: фото, описание, отзывы (из заявок с непустым `review`).
-`/admin/rooms` — список залов у админа, добавить/редактировать/удалить, в форме — фото (загрузка файла) и описание.
-При создании заявки пользователь выбирает зал из `<select>` (а не вводит название текстом).
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-## Логика входа
-Один вход (`/login`) для всех. Пароль хранится и сравнивается как есть, без хэша (`User::where('password', ...)`). После совпадения логина/пароля — `Auth::login($user)`, дальше редирект по `is_admin`:
-- обычный пользователь → `/bookings`
-- админ (сидированный Conf2027/Demo77) → `/admin/dashboard`
-Отдельной страницы `/admin` больше нет.
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-## Логика статусов заявки
-Новая → Мероприятие назначено / Завершено (меняет только админ).
-Отзыв доступен пользователю только когда статус = Завершено.
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
+
+## Learning Laravel
+
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+
+You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+
+## Laravel Sponsors
+
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+
+### Premium Partners
+
+- **[Vehikl](https://vehikl.com/)**
+- **[Tighten Co.](https://tighten.co)**
+- **[WebReinvent](https://webreinvent.com/)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
+- **[Cyber-Duck](https://cyber-duck.co.uk)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Jump24](https://jump24.co.uk)**
+- **[Redberry](https://redberry.international/laravel/)**
+- **[Active Logic](https://activelogic.com)**
+- **[byte5](https://byte5.de)**
+- **[OP.GG](https://op.gg)**
+
+## Contributing
+
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+
+## Code of Conduct
+
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+
+## License
+
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
