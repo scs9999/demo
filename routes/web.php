@@ -20,7 +20,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/bookings/create', [BookingController::class, 'create']);
     Route::post('/bookings', [BookingController::class, 'store']);
     Route::post('/bookings/{booking}/review', [BookingController::class, 'review']);
+    Route::post('/rooms/{room}/comments', [RoomController::class, 'comment']);
+});
 
+Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
     Route::post('/admin/bookings/{booking}/status', [AdminController::class, 'status']);
 

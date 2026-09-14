@@ -14,7 +14,7 @@ class AdminSeeder extends Seeder
             'login' => 'Conf2027',
             'phone' => '8(000)000-00-00',
             'email' => 'admin@conf.ru',
-            'password' => bcrypt('Demo77'),
+            'password' => 'Demo77',
             'is_admin' => true,
         ]);
     }

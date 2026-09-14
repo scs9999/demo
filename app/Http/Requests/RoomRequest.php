@@ -17,7 +17,7 @@ class RoomRequest extends FormRequest
             'name' => 'required|string',
             'type' => 'required|string',
             'description' => 'nullable|string',
-            'photo' => 'nullable|image',
+            'photo' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp',
         ];
     }
 }

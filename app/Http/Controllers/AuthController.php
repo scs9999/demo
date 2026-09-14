@@ -16,9 +16,7 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
-        $data = $request->validated();
-        $data['password'] = bcrypt($data['password']);
-        User::create($data);
+        User::create($request->validated());
 
         return redirect('/login');
     }
@@ -30,15 +28,17 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        if (!Auth::attempt($request->validated())) {
+        $user = User::where('login', $request->login)
+            ->where('password', $request->password)
+            ->first();
+
+        if (!$user) {
             return back()->withErrors(['login' => 'Неверный логин или пароль']);
         }
 
-        if (auth()->user()->is_admin) {
-            return redirect('/admin/dashboard');
-        }
+        Auth::login($user);
 
-        return redirect('/bookings');
+        return redirect('/');
     }
 
     public function logout()

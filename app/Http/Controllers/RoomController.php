@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RoomRequest;
+use App\Http\Requests\CommentRequest;
 use App\Models\Room;
 
 class RoomController extends Controller
@@ -16,34 +17,33 @@ class RoomController extends Controller
     public function show(Room $room)
     {
         $reviews = $room->bookings()->whereNotNull('review')->with('user')->get();
-        return view('room', compact('room', 'reviews'));
+        $comments = $room->comments()->with('user')->latest()->get();
+        return view('room', compact('room', 'reviews', 'comments'));
+    }
+
+    public function comment(CommentRequest $request, Room $room)
+    {
+        $room->comments()->create([
+            'user_id' => auth()->id(),
+            'text' => $request->validated('text'),
+        ]);
+
+        return back();
     }
 
     public function index()
     {
-        if (!auth()->user()->is_admin) {
-            abort(403);
-        }
-
         $rooms = Room::all();
         return view('admin_rooms', compact('rooms'));
     }
 
     public function create()
     {
-        if (!auth()->user()->is_admin) {
-            abort(403);
-        }
-
         return view('room_create');
     }
 
     public function store(RoomRequest $request)
     {
-        if (!auth()->user()->is_admin) {
-            abort(403);
-        }
-
         $data = $request->validated();
 
         if ($request->hasFile('photo')) {
@@ -57,19 +57,11 @@ class RoomController extends Controller
 
     public function edit(Room $room)
     {
-        if (!auth()->user()->is_admin) {
-            abort(403);
-        }
-
         return view('room_edit', compact('room'));
     }
 
     public function update(RoomRequest $request, Room $room)
     {
-        if (!auth()->user()->is_admin) {
-            abort(403);
-        }
-
         $data = $request->validated();
 
         if ($request->hasFile('photo')) {
@@ -83,10 +75,6 @@ class RoomController extends Controller
 
     public function destroy(Room $room)
     {
-        if (!auth()->user()->is_admin) {
-            abort(403);
-        }
-
         $room->delete();
 
         return redirect('/admin/rooms');

@@ -4,14 +4,23 @@
 1. `composer create-project laravel/laravel conf` — создать базовый проект (пакеты берутся с офлайн-сервера).
 2. Скопировать содержимое этой папки поверх созданного проекта (файлы `app/`, `database/`, `resources/`, `routes/web.php`, `README.md` — заменяют/дополняют то, что сгенерировал composer).
 3. Настроить `.env`: `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` под общий сервер БД.
-4. `php artisan migrate --seed` (или `migrate` + `php artisan db:seed`) — создаст только админа Conf2027/Demo77, таблица залов пустая — добавляй через `/admin/rooms/create`
-5. Скопировать шрифты (PTSans-Regular.ttf, PTSans-Bold.ttf) в `public/fonts/`.
-6. `php artisan storage:link` — без этого фото залов не будут показываться (папка `storage/app/public/rooms`).
-7. `php artisan serve`
+4. В `bootstrap/app.php` зарегистрировать middleware `admin` (файл создаёт composer, этой строки там по умолчанию нет):
+```php
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->alias([
+        'admin' => \App\Http\Middleware\IsAdmin::class,
+    ]);
+})
+```
+5. `php artisan migrate --seed` (или `migrate` + `php artisan db:seed`) — создаст только админа Conf2027/Demo77, таблица залов пустая — добавляй через `/admin/rooms/create`
+6. Скопировать шрифты (PTSans-Regular.ttf, PTSans-Bold.ttf) в `public/fonts/`.
+7. `php artisan storage:link` — без этого фото залов не будут показываться (папка `storage/app/public/rooms`).
+8. `php artisan serve`
 
 ## Что где
 - `database/migrations/` — таблицы users (+login, phone, is_admin), rooms, bookings (room_id → rooms)
 - `app/Models/` — User, Room, Booking
+- `app/Http/Middleware/IsAdmin.php` — проверка `is_admin` в одном месте (алиас `admin`, вешается на группу роутов, не в каждом методе контроллера)
 - `app/Http/Requests/` — RegisterRequest, LoginRequest, BookingRequest, ReviewRequest, StatusRequest, RoomRequest
 - `database/seeders/AdminSeeder.php` — создаёт пользователя-админа (login=Conf2027, password=Demo77, is_admin=true)
 - `app/Http/Controllers/` — AuthController (общий вход — по `is_admin` редиректит на `/bookings` или `/admin/dashboard`), BookingController (заявки), AdminController (статусы заявок, п.5 задания), RoomController (главная страница со списком залов + CRUD залов у админа)
@@ -26,7 +35,7 @@
 При создании заявки пользователь выбирает зал из `<select>` (а не вводит название текстом).
 
 ## Логика входа
-Один вход (`/login`) для всех. После `Auth::attempt` проверяется `is_admin`:
+Один вход (`/login`) для всех. Пароль хранится и сравнивается как есть, без хэша (`User::where('password', ...)`). После совпадения логина/пароля — `Auth::login($user)`, дальше редирект по `is_admin`:
 - обычный пользователь → `/bookings`
 - админ (сидированный Conf2027/Demo77) → `/admin/dashboard`
 Отдельной страницы `/admin` больше нет.
